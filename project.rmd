@@ -5,6 +5,8 @@ output: html_notebook
 
 # Final project
 
+**Team**: Oleksii Mytnyk, Yaroslav Klym, Shevchenko Ivan
+
 ```{r message=FALSE}
 require(BSDA)
 library(BSDA)
