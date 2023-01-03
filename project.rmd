@@ -14,7 +14,7 @@ library(dplyr)
 library(tidyr)
 ```
 
-### Sample data description
+## Sample data description
 
 We decided to choose to analyze Steam PC game dataset.
 
@@ -23,9 +23,11 @@ data = read.csv("games_data.csv")
 data
 ```
 
-### Hypothesis testing
+## Distribution of price
 
-#### 1. Test whether price has normal distribution
+We will test dependency between price and another parameters of the game.
+
+Here we analyze the distribution of price of games and testing whether it have normal distribution. We used Kolmogorov test to check it and we see that this distribution is not normal as p-value is small.
 
 ```{r warning=FALSE}
 data["price"][data["price"] == "Free to play"] <- 0
@@ -37,14 +39,19 @@ price_mean <- mean(sample_data_with_price$price)
 price_data <- sample_data_with_price %>% filter(price <= price_mean + sigma2)
 price_data <- price_data$price
 plot(density(price_data))
+print(paste("Mean:", mean(price_data)))
+print(paste("Median:", median(price_data)))
+print(paste("Variance:", var(price_data)))
+print(paste("Skewness:", skewness(price_data)))
+print(paste("Kurtosis:", kurtosis(price_data)))
 ks.test(price_data, "pnorm", mean(price_data), sd(price_data))
 ```
 
-##### Conclusion
+## Hypothesis testing
 
-The distribution of price is not normal.
+### Testing price for different genres
 
-#### 2. Testing price for different genres
+Here we will search a dependency between genre of the game and it's price. In order to that we take average price of all games that are from searched genre.
 
 ```{r}
 sample_data_by_genre <- sample_data_with_price %>% separate_rows(genres, sep = ";") %>% filter(gsub(" ", "", genres) != "")
@@ -53,7 +60,9 @@ grouped_data <- sample_data_by_genre %>% group_by(genres) %>% filter(10 < n()) %
 grouped_data[order(grouped_data$average_price), ]
 ```
 
-#### 3. Racing costs more than Adventure
+#### 1. Racing costs more than Adventure
+
+Here we test whether racing games costs more than adventure. We use t-test, as we want to compare two means and we don't have population variance.
 
 ```{r}
 sample_racing <- (sample_data_by_genre %>% filter(genres == "Racing"))$price
@@ -61,7 +70,9 @@ sample_adventure <- (sample_data_by_genre %>% filter(genres == "Adventure"))$pri
 t.test(x = sample_racing, y = sample_adventure, alternative = "l")
 ```
 
-#### 4. Indie games are cheaper in general
+#### 2. Indie games are cheaper in general
+
+Here we test whether indie games costs less than average game. We use t-test, as we want to compare two means and we don't have population variance.
 
 ```{r}
 sample_indie <- (sample_data_by_genre %>% filter(genres == "Indie"))$price
@@ -69,7 +80,9 @@ sample_all <- (sample_data_by_genre)$price
 t.test(x = sample_indie, y = sample_all, alternative = "g")
 ```
 
-#### 5. Racing games are expensive
+#### 3. Racing games are expensive
+
+Here we test whether racing games costs more than average game. We use t-test, as we want to compare two means and we don't have population variance.
 
 ```{r}
 sample_racing <- (sample_data_by_genre %>% filter(genres == "Racing"))$price
@@ -77,7 +90,9 @@ sample_all <- (sample_data_by_genre)$price
 t.test(x = sample_racing, y = sample_all, alternative = "l")
 ```
 
-#### 6. Developer with the most positive reviews
+### 2. Developer with the most positive reviews
+
+Here we search for developer with the biggest percentage of positive review.
 
 ```{r}
 sample_data_with_reviews <- sample_data %>% transform(percent_positive = as.numeric(gsub("%", "", percent_positive))) %>% filter(!is.na(percent_positive)) %>% filter(reviews > 1000)
@@ -88,8 +103,9 @@ grouped_data <- sample_data_by_developer %>% group_by(developer) %>% filter(3 < 
 grouped_data[order(grouped_data$average_percent_positive, decreasing = T), ]
 ```
 
+### 3. Testing price for single-player, multi-player
 
-#### 7. Testing price for single-player, mmulti-player
+Here we will search a dependency between whether game is single-player or multi-player and it's price. In order to that we take average price of all games that are from searched type.
 
 ```{r}
 sample_data_by_ms <- sample_data_with_price %>% separate_rows(multiplayer_or_singleplayer, sep = ";") %>% filter(gsub(" ", "",multiplayer_or_singleplayer) != "")
@@ -100,7 +116,9 @@ player <- c('Single-player', 'Multi-player')
 grouped_data[grouped_data$multiplayer_or_singleplayer %in% player, ]
 ```
 
-#### 8. Multi-player games are more expensive then Single-player
+#### 1. Multi-player games are more expensive then Single-player
+
+Here we test whether multiplayer games costs more than single-player game. We use t-test, as we want to compare two means and we don't have population variance.
 
 ```{r}
 multi.player <- (sample_data_by_ms %>% filter(multiplayer_or_singleplayer == 'Multi-player'))$price
