@@ -10,6 +10,7 @@ require(BSDA)
 library(BSDA)
 require(EnvStats)
 library(EnvStats)
+library(dplyr)
 ```
 
 ### Sample data description
@@ -26,7 +27,11 @@ data
 #### 1. ...
 
 ```{r}
-t.test()
+price_data <- as.vector(data$price) %>%
+              lapply(function (value) as.double(gsub(",", "", value)))
+price_data
+mean(data$price)
+#ks.test(price_data, "pnorm", mean(price_data), sd(price_data))
 ```
 
 #### 2. ...
