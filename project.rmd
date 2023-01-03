@@ -1,0 +1,40 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Final project
+
+```{r message=FALSE}
+require(BSDA)
+library(BSDA)
+require(EnvStats)
+library(EnvStats)
+```
+
+### Sample data description
+
+We decided to choose to analyze Steam PC game dataset.
+
+```{r}
+data = read.csv("games_data.csv")
+data
+```
+
+### Hypothesis testing
+
+#### 1. ...
+
+```{r}
+t.test()
+```
+
+#### 2. ...
+
+```{r}
+
+```
+
+### Conclusion
+
+......
