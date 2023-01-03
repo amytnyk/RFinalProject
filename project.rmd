@@ -11,6 +11,7 @@ library(BSDA)
 require(EnvStats)
 library(EnvStats)
 library(dplyr)
+library(tidyr)
 ```
 
 ### Sample data description
@@ -48,7 +49,9 @@ The distribution of price is not normal.
 
 ```{r}
 
+grouped_data <- sample_data_with_price %>% filter(genres != "") %>% separate_rows(genres, sep = ";") %>% group_by(genres) %>% summarise_at(vars(price), list(average_price = mean))
 
+grouped_data[order(grouped_data$average_price), ]
 ```
 
 ### Conclusion
