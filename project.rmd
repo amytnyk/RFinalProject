@@ -88,6 +88,26 @@ grouped_data <- sample_data_by_developer %>% group_by(developer) %>% filter(3 < 
 grouped_data[order(grouped_data$average_percent_positive, decreasing = T), ]
 ```
 
+
+#### 7. Testing price for single-player, mmulti-player
+
+```{r}
+sample_data_by_ms <- sample_data_with_price %>% separate_rows(multiplayer_or_singleplayer, sep = ";") %>% filter(gsub(" ", "",multiplayer_or_singleplayer) != "")
+grouped_data <- sample_data_by_ms %>% group_by(multiplayer_or_singleplayer) %>% filter(10 < n())  %>% summarise_at(vars(price), list(average_price = mean))
+
+player <- c('Single-player', 'Multi-player')
+
+grouped_data[grouped_data$multiplayer_or_singleplayer %in% player, ]
+```
+
+#### 8. Multi-player games are more expensive then Single-player
+
+```{r}
+multi.player <- (sample_data_by_ms %>% filter(multiplayer_or_singleplayer == 'Multi-player'))$price
+single.player <- (sample_data_by_ms %>% filter(multiplayer_or_singleplayer == 'Single-player'))$price
+t.test(x = multi.player, y = single.player, alternative = 'g')
+```
+
 ### Conclusion
 
 ......
