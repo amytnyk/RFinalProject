@@ -29,12 +29,13 @@ data
 
 ```{r warning=FALSE}
 data["price"][data["price"] == "Free to play"] <- 0
+sample_data <- data
 sample_data_with_price <- data %>% transform(price = as.numeric(gsub(",", "", price))) %>% filter(!is.na(price))
 sigma2 <- 2 * sd(sample_data_with_price$price)
 price_mean <- mean(sample_data_with_price$price)
-sample_data_with_price <- sample_data_with_price %>% filter(price <= price_mean + sigma2)
 
-price_data <- sample_data_with_price$price
+price_data <- sample_data_with_price %>% filter(price <= price_mean + sigma2)
+price_data <- price_data$price
 plot(density(price_data))
 ks.test(price_data, "pnorm", mean(price_data), sd(price_data))
 ```
@@ -47,7 +48,7 @@ The distribution of price is not normal.
 
 ```{r}
 sample_data_by_genre <- sample_data_with_price %>% separate_rows(genres, sep = ";") %>% filter(gsub(" ", "", genres) != "")
-grouped_data <- sample_data_by_genre %>% group_by(genres) %>% filter(10 < n())  %>% summarise_at(vars(price), list(average_price = mean))
+grouped_data <- sample_data_by_genre %>% group_by(genres) %>% filter(10 < n()) %>% summarise_at(vars(price), list(average_price = mean))
 
 grouped_data[order(grouped_data$average_price), ]
 ```
@@ -74,6 +75,17 @@ t.test(x = sample_indie, y = sample_all, alternative = "g")
 sample_racing <- (sample_data_by_genre %>% filter(genres == "Racing"))$price
 sample_all <- (sample_data_by_genre)$price
 t.test(x = sample_racing, y = sample_all, alternative = "l")
+```
+
+#### 6. Developer with the most positive reviews
+
+```{r}
+sample_data_with_reviews <- sample_data %>% transform(percent_positive = as.numeric(gsub("%", "", percent_positive))) %>% filter(!is.na(percent_positive)) %>% filter(reviews > 1000)
+sample_data_by_developer <- sample_data_with_reviews %>% filter(gsub(" ", "", developer) != "")
+
+grouped_data <- sample_data_by_developer %>% group_by(developer) %>% filter(3 < n()) %>% summarise_at(vars(percent_positive), list(average_percent_positive = mean))
+
+grouped_data[order(grouped_data$average_percent_positive, decreasing = T), ]
 ```
 
 ### Conclusion
