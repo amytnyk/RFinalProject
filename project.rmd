@@ -60,6 +60,22 @@ sample_adventure <- (sample_data_by_genre %>% filter(genres == "Adventure"))$pri
 t.test(x = sample_racing, y = sample_adventure, alternative = "l")
 ```
 
+#### 4. Indie games are cheaper in general
+
+```{r}
+sample_indie <- (sample_data_by_genre %>% filter(genres == "Indie"))$price
+sample_all <- (sample_data_by_genre)$price
+t.test(x = sample_indie, y = sample_all, alternative = "g")
+```
+
+#### 5. Racing games are expensive
+
+```{r}
+sample_racing <- (sample_data_by_genre %>% filter(genres == "Racing"))$price
+sample_all <- (sample_data_by_genre)$price
+t.test(x = sample_racing, y = sample_all, alternative = "l")
+```
+
 ### Conclusion
 
 ......
