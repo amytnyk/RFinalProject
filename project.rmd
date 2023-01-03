@@ -24,19 +24,30 @@ data
 
 ### Hypothesis testing
 
-#### 1. ...
+#### 1. Test whether price has normal distribution
 
-```{r}
-price_data <- as.vector(data$price) %>%
-              lapply(function (value) as.double(gsub(",", "", value)))
-price_data
-mean(data$price)
-#ks.test(price_data, "pnorm", mean(price_data), sd(price_data))
+```{r warning=FALSE}
+sample_data_with_price <- data %>%
+  transform(price = as.numeric(gsub(",", "", price))) %>%
+  filter(!is.na(price))
+sigma2 <- 2 * sd(sample_data_with_price$price)
+price_mean <- mean(sample_data_with_price$price)
+sample_data_with_price <- sample_data_with_price %>%
+  filter(price <= price_mean + sigma2)
+
+price_data <- sample_data_with_price$price
+plot(density(price_data))
+ks.test(price_data, "pnorm", mean(price_data), sd(price_data))
 ```
 
-#### 2. ...
+##### Conclusion
+
+The distribution of price is not normal.
+
+#### 2. Testing price for different genres
 
 ```{r}
+
 
 ```
 
