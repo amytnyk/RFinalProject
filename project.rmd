@@ -28,13 +28,11 @@ data
 #### 1. Test whether price has normal distribution
 
 ```{r warning=FALSE}
-sample_data_with_price <- data %>%
-  transform(price = as.numeric(gsub(",", "", price))) %>%
-  filter(!is.na(price))
+data["price"][data["price"] == "Free to play"] <- 0
+sample_data_with_price <- data %>% transform(price = as.numeric(gsub(",", "", price))) %>% filter(!is.na(price))
 sigma2 <- 2 * sd(sample_data_with_price$price)
 price_mean <- mean(sample_data_with_price$price)
-sample_data_with_price <- sample_data_with_price %>%
-  filter(price <= price_mean + sigma2)
+sample_data_with_price <- sample_data_with_price %>% filter(price <= price_mean + sigma2)
 
 price_data <- sample_data_with_price$price
 plot(density(price_data))
@@ -48,10 +46,18 @@ The distribution of price is not normal.
 #### 2. Testing price for different genres
 
 ```{r}
-
-grouped_data <- sample_data_with_price %>% separate_rows(genres, sep = ";") %>% filter(gsub(" ", "", genres) != "") %>% group_by(genres) %>% summarise_at(vars(price), list(average_price = mean))
+sample_data_by_genre <- sample_data_with_price %>% separate_rows(genres, sep = ";") %>% filter(gsub(" ", "", genres) != "")
+grouped_data <- sample_data_by_genre %>% group_by(genres) %>% filter(10 < n())  %>% summarise_at(vars(price), list(average_price = mean))
 
 grouped_data[order(grouped_data$average_price), ]
+```
+
+#### 3. Racing costs more than Adventure
+
+```{r}
+sample_racing <- (sample_data_by_genre %>% filter(genres == "Racing"))$price
+sample_adventure <- (sample_data_by_genre %>% filter(genres == "Adventure"))$price
+t.test(x = sample_racing, y = sample_adventure, alternative = "l")
 ```
 
 ### Conclusion
