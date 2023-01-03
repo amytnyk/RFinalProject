@@ -27,7 +27,7 @@ data
 
 We will test dependency between price and another parameters of the game.
 
-Here we analyze the distribution of price of games and testing whether it have normal distribution. We used Kolmogorov test to check it and we see that this distribution is not normal as p-value is small.
+Here we analyze the distribution of the price of the games and testing whether it have normal distribution. We used Kolmogorov test to check it and we see that this distribution is not normal as p-value is small.
 
 ```{r warning=FALSE}
 data["price"][data["price"] == "Free to play"] <- 0
@@ -70,6 +70,8 @@ sample_adventure <- (sample_data_by_genre %>% filter(genres == "Adventure"))$pri
 t.test(x = sample_racing, y = sample_adventure, alternative = "l")
 ```
 
+Since the p-value is large, **racing games are more expensive than adventure games**.
+
 #### 2. Indie games are cheaper in general
 
 Here we test whether indie games costs less than average game. We use t-test, as we want to compare two means and we don't have population variance.
@@ -79,6 +81,8 @@ sample_indie <- (sample_data_by_genre %>% filter(genres == "Indie"))$price
 sample_all <- (sample_data_by_genre)$price
 t.test(x = sample_indie, y = sample_all, alternative = "g")
 ```
+
+Since the p-value is large, **indie games are cheaper than average**.
 
 #### 3. Racing games are expensive
 
@@ -90,9 +94,9 @@ sample_all <- (sample_data_by_genre)$price
 t.test(x = sample_racing, y = sample_all, alternative = "l")
 ```
 
-### 2. Developer with the most positive reviews
+Since the p-value is large, **racing games are more expensive than average**.
 
-Here we search for developer with the biggest percentage of positive review.
+### Testing positive reviews percentage for different developers
 
 ```{r}
 sample_data_with_reviews <- sample_data %>% transform(percent_positive = as.numeric(gsub("%", "", percent_positive))) %>% filter(!is.na(percent_positive)) %>% filter(reviews > 1000)
@@ -103,7 +107,21 @@ grouped_data <- sample_data_by_developer %>% group_by(developer) %>% filter(3 < 
 grouped_data[order(grouped_data$average_percent_positive, decreasing = T), ]
 ```
 
-### 3. Testing price for single-player, multi-player
+#### 4. CD PROJEKT RED has more positive reviews than Ubisoft
+
+Here we test whether CD PROJEKT RED has more positive reviews than Ubisoft. We use t-test, as we want to compare two means and we don't have population variance.
+
+```{r}
+sample_red <- (sample_data_by_developer %>% filter(developer == "CD PROJEKT RED"))$percent_positive
+sample_ubisoft <- (sample_data_by_developer %>% filter(developer == "Ubisoft Montreal"))$percent_positive
+t.test(x = sample_red, y = sample_ubisoft, alternative = "l")
+```
+
+Since the p-value is large, **CD PROJEKT RED has more positive reviews than Ubisoft**.
+
+### Testing price for different game modes
+
+#### 5. Testing price for single-player, multi-player
 
 Here we will search a dependency between whether game is single-player or multi-player and it's price. In order to that we take average price of all games that are from searched type.
 
@@ -116,7 +134,7 @@ player <- c('Single-player', 'Multi-player')
 grouped_data[grouped_data$multiplayer_or_singleplayer %in% player, ]
 ```
 
-#### 1. Multi-player games are more expensive then Single-player
+#### 6. Multi-player games are more expensive then Single-player
 
 Here we test whether multiplayer games costs more than single-player game. We use t-test, as we want to compare two means and we don't have population variance.
 
@@ -125,7 +143,3 @@ multi.player <- (sample_data_by_ms %>% filter(multiplayer_or_singleplayer == 'Mu
 single.player <- (sample_data_by_ms %>% filter(multiplayer_or_singleplayer == 'Single-player'))$price
 t.test(x = multi.player, y = single.player, alternative = 'g')
 ```
-
-### Conclusion
-
-......
